@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>个人演唱会纪念网站</title>
+  <style>
+    :root{
+      --paper-bg:#dceffb;
+      --paper:#ffffff;
+      --paper-2:#f2faff;
+      --ink:#1f3a4d;
+      --ink-soft:#4a6b80;
+      --line:#a9d5ee;
+      --accent:#2f9fe0;
+      --accent-dark:#1b7cb8;
+      --accent-soft:#d6eefc;
+      --tape:rgba(122,192,236,.55);
+      --tape2:rgba(160,214,247,.62);
+      --shadow:5px 5px 0 rgba(31,58,77,.16);
+      --shadow-sm:3px 3px 0 rgba(31,58,77,.14);
+      --ticket:#eaf6ff;
+      --ticket-border:#9fd3f0;
+      --radius:8px;
+      --font-pixel:'Press Start 2P','ZCOOL QingKe HuangYou','PingFang SC',monospace;
+      --font-body:'PingFang SC','Microsoft YaHei',system-ui,-apple-system,'Segoe UI',sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background-color: var(--paper-bg);
+      background-image:
+        linear-gradient(rgba(47,159,224,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47,159,224,.08) 1px, transparent 1px);
+      background-size: 22px 22px;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* ===== 站头 ===== */
+    header.site-header {
+      position: relative;
+      max-width: 1100px;
+      margin: 14px auto 24px;
+      padding: 22px 18px 16px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    header.site-header::before {
+      content: "";
+      position: absolute;
+      top: -13px; left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 130px; height: 26px;
+      background: var(--tape);
+      border-left: 1px dashed rgba(255,255,255,.7);
+      border-right: 1px dashed rgba(255,255,255,.7);
+    }
+    .site-title {
+      font-family: var(--font-pixel);
+      font-size: 20px;
+      line-height: 1.7;
+      letter-spacing: 1px;
+      color: var(--ink);
+    }
+    .site-sub {
+      margin-top: 12px;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+    }
+    .sound-toggle {
+      position: absolute;
+      top: 12px; right: 12px;
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      padding: 7px 9px;
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      background: var(--paper-2);
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .sound-toggle:active { transform: translate(3px,3px); box-shadow:none; }
+
+    /* ===== 布局 ===== */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    section.card {
+      position: relative;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-pixel);
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+
+    /* ===== 表单 ===== */
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; margin-bottom: 8px; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end; margin-bottom: 8px; }
+
+    input[type="text"], input[type="date"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 2px solid var(--line);
+      background: var(--paper-2);
+      color: var(--ink);
+      font-size: 14px;
+      font-family: var(--font-body);
+    }
+    input[type="text"]:focus, input[type="date"]:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    /* ===== 按钮 ===== */
+    button.btn {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      line-height: 1.6;
+      padding: 10px 13px;
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: transform .06s ease, box-shadow .06s ease, background .12s ease;
+    }
+    button.btn:hover { background: var(--accent-soft); }
+    button.btn:active { transform: translate(3px,3px); box-shadow: none; }
+    button.btn.secondary { background: var(--paper-2); }
+    button.btn.danger { background: #ffe3e3; border-color: #c0392b; color: #c0392b; }
+    button.btn.danger:hover { background: #ffd0d0; }
+
+    /* ===== 模块入口（书签式导航） ===== */
+    .module-stack { width: 100%; }
+    .module-btn {
+      font-family: var(--font-pixel);
+      font-size: 13px;
+      line-height: 1.8;
+      padding: 16px 18px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      box-shadow: var(--shadow);
+      transition: transform .08s ease, background .12s ease;
+    }
+    .module-btn::before { content: "\25B8  "; color: var(--accent); }
+    .module-btn:hover { background: var(--accent-soft); transform: translateY(-2px); }
+    .module-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-dark);
+    }
+    .module-btn.active::before { color: #fff; }
+
+    /* ===== 票根操作按钮行 ===== */
+    .ticket-controls { margin-top: 8px; display: flex; gap: 8px; align-items: center; justify-content: center; }
+
+    /* ===== 票根卡片（参考 bigbullui ticket-card） ===== */
+    .ticket-card {
+      --stub-w: 200px;
+      --stamp: #bc3a28;
+      position: relative;
+      display: flex;
+      overflow: hidden;               /* 让伪元素缺口被裁成半圆 */
+      background: var(--ticket);
+      border: 2px solid var(--ink);    /* 墨水线条：实线外框 */
+      border-radius: var(--radius);    /* 形状：方形圆角 */
+      box-shadow: var(--shadow);
+      margin-bottom: 4px;
+    }
+    /* 缺口：纯 CSS 伪元素（上下各一个，圆心落在撕票线上） */
+    .ticket-card::before,
+    .ticket-card::after {
+      content: "";
+      position: absolute;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--paper);        /* 与所在卡片底色一致，形成“咬掉”效果 */
+      border: 2px solid var(--ink);
+      right: calc(var(--stub-w) - 11px);
+      z-index: 3;
+    }
+    .ticket-card::before { top: -13px; }
+    .ticket-card::after { bottom: -13px; }
+
+    .tc-main {
+      flex: 1; min-width: 0;
+      padding: 18px 20px;
+      display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+    }
+    .tc-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .tc-admit { font-family: var(--font-pixel); font-size: 9px; letter-spacing: 2px; color: var(--stamp); }
+    .tc-serial { font-family: var(--font-pixel); font-size: 9px; letter-spacing: 1px; color: var(--ink-soft); }
+    .tc-event { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: .5px; line-height: 1.35; }
+    .tc-event .dot { color: var(--accent); margin: 0 6px; }
+
+    .tc-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center;
+      border-top: 2px dashed var(--line);
+      border-bottom: 2px dashed var(--line);
+      padding: 11px 0;
+    }
+    .tc-grid .k { display: block; font-family: var(--font-pixel); font-size: 8px; letter-spacing: 1px; color: var(--ink-soft); }
+    .tc-grid .v { display: block; margin-top: 7px; font-size: 13px; font-weight: 700; color: var(--ink); word-break: break-word; }
+
+    .tc-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-soft); }
+    .tc-foot .brand { font-family: var(--font-pixel); font-size: 8px; letter-spacing: 1px; }
+    .tc-foot .countdown { font-family: var(--font-pixel); font-size: 10px; color: var(--accent-dark); }
+
+    .tc-stub {
+      width: var(--stub-w); flex: 0 0 var(--stub-w);
+      border-left: 2px dashed var(--line);   /* 虚线撕票线 */
+      padding: 16px 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      text-align: center;
+      background: rgba(255,255,255,.45);
+    }
+    .tc-stub-label { font-family: var(--font-pixel); font-size: 8px; letter-spacing: 2px; color: var(--ink-soft); }
+    .tc-stub-event { font-size: 13px; font-weight: 700; margin-top: 8px; line-height: 1.4; word-break: break-word; }
+    .tc-stub-meta { font-size: 11px; color: var(--ink-soft); margin-top: 6px; }
+
+    /* 红色图章 */
+    .tc-stamp {
+      display: inline-block;
+      transform: rotate(-6deg);
+      border: 2px solid var(--stamp);
+      color: var(--stamp);
+      background: rgba(188,58,40,.08);
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      letter-spacing: 2px;
+      margin: 10px 0;
+    }
+    /* 存根底部的虚线装饰 */
+    .tc-dash { width: 92px; border-top: 2px dashed var(--ink-soft); opacity: .55; margin: 4px 0 6px; }
+    .tc-stub-num { font-family: var(--font-pixel); font-size: 7px; letter-spacing: 2px; color: var(--ink-soft); }
+
+
+    /* ===== 已看过：竖向时间线 + 年份书签 ===== */
+    .timeline { position: relative; padding-left: 44px; }
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 15px; top: 4px; bottom: 4px;
+      width: 3px; border-radius: 2px;
+      background: repeating-linear-gradient(180deg, var(--accent) 0 8px, transparent 8px 15px);
+    }
+    .year-tab {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      font-size: 12px;
+      color: #fff;
+      background: var(--accent);
+      padding: 7px 14px;
+      border-radius: 6px;
+      margin: 6px 0 16px -32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .tl-item { position: relative; margin-bottom: 22px; }
+    /* 手绘风回形针（放大） */
+    .paperclip {
+      position: absolute;
+      top: -20px; right: 16px;
+      width: 30px; height: 62px;
+      z-index: 3;
+      transform: rotate(8deg);
+      pointer-events: none;
+      filter: drop-shadow(1px 2px 0 rgba(31,58,77,.18));
+    }
+
+    /* ===== 即将看：撕历倒计时 ===== */
+    .flipcal-card {
+      position: relative;
+      background: var(--paper-2);
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px 16px 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .flipcal-card::before {
+      content: "";
+      position: absolute;
+      top: -11px; left: 24px;
+      width: 70px; height: 19px;
+      background: var(--tape2);
+      transform: rotate(-3deg);
+    }
+    .flipcal-title {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      line-height: 1.9;
+      color: var(--accent-dark);
+      margin-bottom: 14px;
+    }
+    .flipcal { display: flex; gap: 12px; align-items: flex-end; justify-content: center; margin-bottom: 16px; }
+    .flipcal .cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .flipcal .digits {
+      font-family: var(--font-pixel);
+      font-size: 38px;
+      line-height: 1;
+      color: var(--accent-dark);
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow);
+    }
+    .flipcal .unit { font-family: var(--font-pixel); font-size: 10px; color: var(--ink-soft); }
+    .flipcal-meta { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+    .prog {
+      height: 16px;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 4px auto 12px;
+      max-width: 520px;
+    }
+    .prog > i {
+      display: block; height: 100%;
+      background: repeating-linear-gradient(90deg, var(--accent) 0 10px, var(--accent-dark) 10px 20px);
+      transition: width .5s ease;
+    }
+
+    /* ===== 想看：软木便利贴墙 ===== */
+    #wish-list.board {
+      position: relative;
+      border-radius: 10px;
+      padding: 30px 24px 24px;
+      min-height: 220px;
+      background-color: #cfe6d8;
+      background-image:
+        radial-gradient(rgba(31,58,77,.10) 1px, transparent 1.4px),
+        radial-gradient(rgba(31,58,77,.06) 1px, transparent 1.4px);
+      background-size: 14px 14px, 14px 14px;
+      background-position: 0 0, 7px 7px;
+      border: 2px solid var(--ink);
+      box-shadow: var(--shadow);
+      display: block;
+    }
+    .notes { display: flex; flex-wrap: wrap; gap: 26px 22px; }
+    .note-card {
+      position: relative;
+      width: 214px;
+      padding: 22px 16px 16px;
+      /* 手绘不规则边框 */
+      border: 2px solid var(--ink);
+      border-radius: 12px 4px 14px 5px / 5px 14px 4px 12px;
+      box-shadow: 3px 4px 0 rgba(31,58,77,.18);
+    }
+    .note-card .push {
+      position: absolute;
+      top: -15px; left: 50%;
+      transform: translateX(-50%);
+      width: 22px; height: 22px;
+      z-index: 2;
+      filter: drop-shadow(1px 2px 0 rgba(31,58,77,.25));
+    }
+    .note-card h4 { margin: 0 0 6px; font-size: 14px; }
+    .note-card .muted { font-size: 12px; color: #3f5568; margin-bottom: 8px; }
+    .note-card .n-acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .note-card .done-check { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #3f5568; }
+    .note-card.is-done { filter: saturate(.7); }
+    .note-card.is-done h4 { text-decoration: line-through; text-decoration-color: #c0392b; }
+    .stamp {
+      position: absolute;
+      right: 8px; bottom: 8px;
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: #c0392b;
+      border: 2px solid #c0392b;
+      border-radius: 4px;
+      padding: 3px 6px;
+      transform: rotate(-12deg);
+      opacity: .85;
+    }
+    /* 便利贴配色（天蓝系深浅） */
+    .note-card.tone-0 { background: #d9f0ff; transform: rotate(-2deg); }
+    .note-card.tone-1 { background: #c9e8fb; transform: rotate(1.5deg); }
+    .note-card.tone-2 { background: #e6f7ff; transform: rotate(-1deg); }
+    .note-card.tone-3 { background: #bfe0f5; transform: rotate(2deg); }
+
+    /* ===== 统计面板 ===== */
+    #stats-section { display: block; }
+    #stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    .stat {
+      position: relative;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      padding: 16px 12px 12px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat::before {
+      content: "";
+      position: absolute;
+      top: -9px; left: 50%;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 42px; height: 15px;
+      background: var(--tape);
+    }
+    .stat .value { font-family: var(--font-pixel); font-size: 20px; line-height: 1.7; color: var(--accent-dark); }
+    .stat .label { font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+
+    /* ===== 首页：翻开的手帐（左目录 / 右总结） ===== */
+    .book {
+      position: relative;
+      perspective: 3600px;
+    }
+    /* 翻页纸片：盖在右页上，绕书脊（左边缘）翻转 */
+    .flip-sheet {
+      position: absolute;
+      top: 0; left: 50%;
+      width: 50%; height: 100%;
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      display: none;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .flip-sheet.turning, .flip-sheet.turning-back { display: block; }
+    .flip-sheet .face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      box-shadow: -14px 0 26px rgba(31,58,77,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image: repeating-linear-gradient(
+        transparent 0, transparent 27px, rgba(47,159,224,.13) 28px);
+    }
+    .flip-sheet .face.back {
+      transform: rotateY(180deg);
+      background: var(--paper-2);
+      border-radius: var(--radius) 0 0 var(--radius);
+      box-shadow: 14px 0 26px rgba(31,58,77,.18);
+    }
+    .flip-title {
+      font-family: var(--font-pixel);
+      font-size: 15px;
+      line-height: 2;
+      color: var(--accent-dark);
+      text-align: center;
+      padding: 0 20px;
+    }
+    @keyframes flipTurn {
+      0%   { transform: rotateY(0deg); }
+      100% { transform: rotateY(-180deg); }
+    }
+    @keyframes flipBack {
+      0%   { transform: rotateY(-180deg); }
+      100% { transform: rotateY(0deg); }
+    }
+    .flip-sheet.turning      { animation: flipTurn .72s cubic-bezier(.42,.05,.25,1) both; }
+    .flip-sheet.turning-back { animation: flipBack .72s cubic-bezier(.42,.05,.25,1) both; }
+
+    .home-spread {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--paper);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    /* 书脊阴影 */
+    .home-spread::before {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 34px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg,
+        rgba(31,58,77,.13), rgba(31,58,77,.02) 35%,
+        rgba(31,58,77,.02) 65%, rgba(31,58,77,.13));
+      pointer-events: none;
+      z-index: 3;
+    }
+    .home-spread .page {
+      position: relative;
+      padding: 26px 26px 46px;
+      background-image: repeating-linear-gradient(
+        transparent 0, transparent 27px, rgba(47,159,224,.13) 28px);
+    }
+    .home-spread .page.left { border-right: 2px solid rgba(31,58,77,.12); }
+    .page-label {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--accent-dark);
+      border-bottom: 2px dashed var(--line);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .page-num {
+      position: absolute;
+      bottom: 14px;
+      font-family: var(--font-pixel);
+      font-size: 9px;
+      color: var(--ink-soft);
+      letter-spacing: 1px;
+    }
+    .home-spread .page.left .page-num { left: 26px; }
+    .home-spread .page.right .page-num { right: 26px; }
+    /* 去掉内部卡片的独立纸片样式，融入整页 */
+    .home-spread #module-switcher,
+    .home-spread #stats-section {
+      border: none; box-shadow: none; background: transparent; padding: 0;
+    }
+    .page-tools {
+      border-top: 2px dashed var(--line);
+      margin-top: 22px;
+      padding-top: 16px;
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    }
+    /* 目录里的模块按钮：贴纸索引卡 */
+    .home-spread .module-btn {
+      position: relative;
+      transform: rotate(-0.7deg);
+    }
+    .home-spread .module-btn:nth-child(2) { transform: rotate(0.6deg); }
+    .home-spread .module-btn:nth-child(3) { transform: rotate(-0.4deg); }
+    .home-spread .module-btn::after {
+      content: "";
+      position: absolute;
+      top: -9px; right: 18px;
+      width: 54px; height: 15px;
+      background: var(--tape);
+      transform: rotate(6deg);
+    }
+    /* 右页统计：贴纸拼贴 */
+    .home-spread .page.right #stats { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .home-spread .stat { transform: rotate(-1deg); }
+    .home-spread .stat:nth-child(even) { transform: rotate(1.1deg); }
+    .pinned-notes { display: flex; flex-direction: column; gap: 16px; margin-top: 18px; }
+    .note {
+      position: relative;
+      background: var(--accent-soft);
+      border: 2px solid var(--ink);
+      border-radius: 6px;
+      padding: 16px 14px 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .note::before {
+      content: "";
+      position: absolute;
+      top: -9px; left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 46px; height: 15px;
+      background: var(--tape);
+    }
+    .note .value {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      line-height: 1.9;
+      color: var(--accent-dark);
+      word-break: break-word;
+    }
+    .note .label { font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+
+    /* 左页底部的手写小记 */
+    .page-doodle {
+      margin-top: 40px;
+      text-align: center;
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      line-height: 2;
+      color: var(--ink-soft);
+      transform: rotate(-1.4deg);
+      opacity: .85;
+    }
+    .page-doodle::before {
+      content: "";
+      display: block;
+      width: 84px; height: 16px;
+      margin: 0 auto 14px;
+      background: var(--tape2);
+      transform: rotate(3deg);
+    }
+
+    .empty-tip { text-align: center; color: var(--ink-soft); padding: 18px 0; font-size: 14px; }
+
+    /* ===== 响应式 ===== */
+    @media (min-width: 860px){
+      .container { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 859px){
+      .row, .row-3 { grid-template-columns: 1fr; }
+      #wish-list { grid-template-columns: 1fr; }
+      .module-section { display: none; }
+      .site-title { font-size: 14px; }
+      .home-spread { grid-template-columns: 1fr; }
+      .home-spread::before { display: none; }
+      .home-spread .page.left { border-right: none; border-bottom: 2px dashed var(--line); }
+      .home-spread .page.right #stats { grid-template-columns: 1fr; }
+      .home-spread .page { padding: 22px 18px 44px; }
+      .home-spread .page.left .page-num { left: 18px; }
+      .home-spread .page.right .page-num { right: 18px; }
+      header.site-header { padding: 20px 12px 14px; max-width: 100%; }
+      .sound-toggle { top: 10px; right: 10px; }
+      .ticket-card { --stub-w: 132px; }
+      .tc-main { padding: 14px 14px; gap: 10px; }
+      .tc-event { font-size: 16px; }
+      .tc-grid .v { font-size: 11px; }
+      .tc-stub { padding: 12px 8px; }
+      .tc-stub-event { font-size: 12px; }
+      .tc-foot .brand { display: none; }
+    }
+
+    .module-header { display: flex; justify-content: flex-start; margin-bottom: 10px; }
+
+    /* 排序控件：避免标签换行 */
+    #seen-sort-controls span { white-space: nowrap; }
+    #seen-sort { width: auto; min-width: 220px; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header" aria-label="站头">
+    <button class="sound-toggle" id="sound-toggle" type="button">♪ 音效</button>
+    <div class="site-title">CONCERT SCRAPBOOK</div>
+    <div class="site-sub">个人演唱会纪念手帐</div>
+  </header>
+
+  <main class="container" id="app">
+    <!-- 首页：翻开的手帐（左页目录 / 右页总结） -->
+    <div id="book" class="book">
+    <div id="home-spread" class="home-spread">
+      <!-- 左页：目录 -->
+      <section class="page left">
+        <div class="page-label">目录 · CONTENTS</div>
+        <section id="module-switcher" aria-label="模块开关" style="display:block;">
+          <div class="module-stack" style="display:flex;flex-direction:column;gap:14px;">
+            <button class="module-btn" data-module="seen" type="button">已看过的演唱会</button>
+            <button class="module-btn" data-module="upcoming" type="button">即将去看的演唱会</button>
+            <button class="module-btn" data-module="wishlist" type="button">想看的演唱会</button>
+          </div>
+          <div class="page-tools">
+            <button class="btn secondary" id="btn-export" type="button">导出备份</button>
+            <button class="btn secondary" id="btn-import" type="button">导入恢复</button>
+            <input type="file" id="import-file" accept="application/json,.json" style="display:none;" />
+          </div>
+        </section>
+        <div class="page-doodle">♪ 记录每一场现场的心动</div>
+        <div class="page-num">01</div>
+      </section>
+
+      <!-- 右页：总结 -->
+      <section class="page right">
+        <div class="page-label">总结 · SUMMARY</div>
+        <section id="stats-section">
+          <div id="stats">
+            <div class="stat">
+              <div class="value" id="stat-seen">0</div>
+              <div class="label">已看场次</div>
+            </div>
+            <div class="stat">
+              <div class="value" id="stat-upcoming">0</div>
+              <div class="label">将要看的场次</div>
+            </div>
+            <div class="stat">
+              <div class="value" id="stat-wishlist">0</div>
+              <div class="label">想看的数量</div>
+            </div>
+            <div class="stat" id="stat-unique">
+              <div class="value" id="stat-unique-label">0</div>
+              <div class="label">已看过的歌手数</div>
+            </div>
+          </div>
+          <div class="pinned-notes">
+            <div id="stat-recent" class="note">
+              <div class="value" id="stat-recent-label">最近一场已看：暂无</div>
+              <div class="label">最近一场演唱会信息</div>
+            </div>
+            <div id="stat-favorites" class="note">
+              <div class="value" id="stat-favorites-label">最期待的一场：暂无</div>
+              <div class="label">最靠近的即将演出</div>
+            </div>
+          </div>
+        </section>
+        <div class="page-num">02</div>
+      </section>
+    </div>
+      <!-- 翻页动画纸页 -->
+      <div class="flip-sheet" id="flip-sheet" aria-hidden="true">
+        <div class="face front"><span class="flip-title" id="flip-title"></span></div>
+        <div class="face back"></div>
+      </div>
+    </div>
+
+    <!-- 1) 已看过的演唱会 -->
+    <section class="card module-section" id="seen-section" style="display:none;">
+      <div class="module-header" style="margin-bottom:8px;">
+        <button class="btn" data-action="home" type="button">返回首页</button>
+      </div>
+      <div class="section-title" style="margin-top:4px;">已看过的演唱会 🎫</div>
+
+      <!-- 新增记录 -->
+      <form id="form-seen" class="row" autocomplete="off">
+        <input type="text" id="seen-artist" placeholder="歌手/乐队" required />
+        <input type="text" id="seen-name" placeholder="演唱会名称" required />
+        <input type="date" id="seen-date" required />
+        <input type="text" id="seen-city" placeholder="城市" required />
+        <input type="text" id="seen-venue" placeholder="场馆" required />
+        <button class="btn" type="submit" style="height:38px;">新增记录</button>
+        <button class="btn secondary cancel-edit" type="button" data-action="cancel-edit" data-type="seen" style="display:none;">取消</button>
+      </form>
+
+      <!-- 排序控件（放在新增记录下方） -->
+      <div id="seen-sort-controls" style="display:flex; justify-content:flex-end; align-items:center; gap:8px; margin:8px 0 12px;">
+        <span style="font-size:14px;">排序：</span>
+        <select id="seen-sort" aria-label="排序方式">
+          <option value="date-desc">按演出时间倒序</option>
+          <option value="artist-asc">按歌手字母顺序（同歌手按时间倒序）</option>
+        </select>
+      </div>
+
+      <!-- 搜索框 -->
+      <div style="margin-bottom:12px;">
+        <input type="text" id="seen-search" placeholder="搜索歌手 / 演唱会名称 / 城市 / 场馆…" style="width:100%;" />
+      </div>
+
+      <div id="seen-list" aria-label="已看过的演唱会列表"></div>
+    </section>
+
+    <!-- 2) 即将去看的演唱会 -->
+    <section class="card module-section" id="upcoming-section" style="display:none;">
+      <div class="module-header" style="margin-bottom:8px;">
+        <button class="btn" data-action="home" type="button">返回首页</button>
+      </div>
+      <div class="section-title" style="margin-top:4px;">即将去看的演唱会 ⏳</div>
+      <form id="form-upcoming" class="row-3" autocomplete="off">
+        <input type="text" id="up-artist" placeholder="歌手/乐队" required />
+        <input type="text" id="up-name" placeholder="演唱会名称" required />
+        <input type="date" id="up-date" required />
+        <input type="text" id="up-city" placeholder="城市" required />
+        <input type="text" id="up-venue" placeholder="场馆" required />
+        <button class="btn" type="submit" style="height:38px;">新增记录</button>
+        <button class="btn secondary cancel-edit" type="button" data-action="cancel-edit" data-type="upcoming" style="display:none;">取消</button>
+      </form>
+
+      <div id="upcoming-list" aria-label="即将看演唱会列表"></div>
+    </section>
+
+    <!-- 3) 想看的演唱会（愿望清单） -->
+    <section class="card module-section" id="wish-section" style="display:none;">
+      <div class="module-header" style="margin-bottom:8px;">
+        <button class="btn" data-action="home" type="button">返回首页</button>
+      </div>
+      <div class="section-title" style="margin-top:4px;">想看的演唱会（愿望清单）</div>
+      <form id="form-wish" class="row" autocomplete="off">
+        <input type="text" id="wish-artist" placeholder="歌手/乐队" required />
+        <input type="text" id="wish-name" placeholder="演唱会名称" required />
+        <button class="btn" type="submit" style="height:38px;">新增到愿望</button>
+        <button class="btn secondary cancel-edit" type="button" data-action="cancel-edit" data-type="wishlist" style="display:none;">取消</button>
+      </form>
+
+      <div id="wish-list" aria-label="愿望清单列表"></div>
+    </section>
+  </main>
+
+  <script>
+    // 应用状态（本地存储）
+    const STORAGE_KEY = 'concertMemories_v1';
+
+    // 内置示例数据：首次打开（本地无存档）时展示，方便分享/预览
+    const DEFAULT_DATA = {
+      seen: [
+        { id: 'demo-s1', artist: '五月天', name: '诺亚方舟', date: '2024-05-20', city: '上海', venue: '梅赛德斯奔驰文化中心' },
+        { id: 'demo-s2', artist: '陈奕迅', name: 'FEAR AND DREAMS', date: '2024-03-02', city: '广州', venue: '天河体育中心' },
+        { id: 'demo-s3', artist: 'Coldplay', name: 'Music of the Spheres', date: '2023-11-08', city: '北京', venue: '国家体育场' },
+        { id: 'demo-s4', artist: '林俊杰', name: 'JJ20', date: '2023-08-19', city: '上海', venue: '虹口足球场' }
+      ],
+      upcoming: [
+        { id: 'demo-u1', artist: '周杰伦', name: '嘉年华', date: '2026-10-01', city: '杭州', venue: '奥体中心体育场' },
+        { id: 'demo-u2', artist: '孙燕姿', name: '就在日落以前', date: '2027-01-16', city: '深圳', venue: '深圳湾体育中心' }
+      ],
+      wishlist: [
+        { id: 'demo-w1', artist: 'Taylor Swift', name: 'The Eras Tour' },
+        { id: 'demo-w2', artist: '邓紫棋', name: 'I AM GLORIA' },
+        { id: 'demo-w3', artist: '陈奕迅', name: '下一站：红馆' }
+      ],
+      seenSortMode: 'date-desc'
+    };
+    const state = {
+      seen: [],       // 已看过的演唱会
+      upcoming: [],   // 即将看
+      wishlist: [],   // 想看的
+      seenSortMode: 'date-desc' // seen 模块排序模式
+    };
+
+    // 编辑状态：记录正在编辑的记录类型与 id（null = 新增模式）
+    const editing = { seen: null, upcoming: null, wishlist: null };
+
+    // 已看列表搜索关键词（运行时，不入库）
+    let seenSearchTerm = '';
+
+    // ===== 8-bit 音效（Web Audio 合成，无外部音频文件） =====
+    let soundEnabled = localStorage.getItem('concertSound') !== 'off';
+    let audioCtx = null;
+    function beep(freq, dur, type, vol) {
+      if (!soundEnabled) return;
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type || 'square';
+        o.frequency.value = freq || 660;
+        g.gain.value = vol || 0.035;
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (dur || 0.06));
+        o.stop(audioCtx.currentTime + (dur || 0.06));
+      } catch (e) { /* 忽略音频错误 */ }
+    }
+    function updateSoundToggle() {
+      const btn = document.getElementById('sound-toggle');
+      if (btn) btn.textContent = soundEnabled ? '♪ 音效' : '♪ 静音';
+    }
+
+    // 编辑模式切换
+    function setEditMode(type, id) {
+      editing[type] = id;
+      // 更新对应表单的提交按钮文案与取消按钮显示
+      const formMap = {
+        seen: { submit: document.querySelector('#form-seen button[type="submit"]'), cancel: document.querySelector('#form-seen .cancel-edit') },
+        upcoming: { submit: document.querySelector('#form-upcoming button[type="submit"]'), cancel: document.querySelector('#form-upcoming .cancel-edit') },
+        wishlist: { submit: document.querySelector('#form-wish button[type="submit"]'), cancel: document.querySelector('#form-wish .cancel-edit') },
+      };
+      const f = formMap[type];
+      if (f) {
+        if (f.submit) f.submit.textContent = id ? '保存修改' : (type === 'wishlist' ? '新增到愿望' : '新增记录');
+        if (f.cancel) f.cancel.style.display = id ? 'inline-block' : 'none';
+      }
+    }
+
+    // 载入某条记录到表单（进入编辑模式）
+    function startEdit(type, id) {
+      const list = editingList(type);
+      const item = list.find(x => x.id === id);
+      if (!item) return;
+      const field = (name) => document.getElementById(name);
+      if (type === 'seen') {
+        field('seen-artist').value = item.artist;
+        field('seen-name').value = item.name;
+        field('seen-date').value = item.date || '';
+        field('seen-city').value = item.city || '';
+        field('seen-venue').value = item.venue || '';
+      } else if (type === 'upcoming') {
+        field('up-artist').value = item.artist;
+        field('up-name').value = item.name;
+        field('up-date').value = item.date || '';
+        field('up-city').value = item.city || '';
+        field('up-venue').value = item.venue || '';
+      } else if (type === 'wishlist') {
+        field('wish-artist').value = item.artist;
+        field('wish-name').value = item.name;
+      }
+      setEditMode(type, id);
+      // 滚动到表单区域，提示用户当前在编辑
+      const section = document.getElementById(type === 'seen' ? 'seen-section' : type === 'upcoming' ? 'upcoming-section' : 'wish-section');
+      if (section) {
+        const form = section.querySelector('form');
+        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // 取消编辑
+    function cancelEdit(type) {
+      setEditMode(type, null);
+      const form = document.getElementById(type === 'seen' ? 'form-seen' : type === 'upcoming' ? 'form-upcoming' : 'form-wish');
+      if (form) form.reset();
+    }
+
+    // 获取对应类型的列表数组
+    function editingList(type) {
+      if (type === 'seen') return state.seen;
+      if (type === 'upcoming') return state.upcoming;
+      if (type === 'wishlist') return state.wishlist;
+      return [];
+    }
+
+    // 保存编辑/新增
+    function saveRecord(type, { artist, name, date, city, venue }) {
+      const id = editing[type];
+      const list = editingList(type);
+      if (id) {
+        // 编辑已有记录
+        const item = list.find(x => x.id === id);
+        if (item) {
+          item.artist = artist;
+          item.name = name;
+          item.date = date || '';
+          item.city = city || '';
+          item.venue = venue || '';
+        }
+      } else {
+        if (type === 'seen') {
+          list.unshift({ id: uid(), artist, name, date, city, venue });
+        } else if (type === 'upcoming') {
+          list.unshift({ id: uid(), artist, name, date, city, venue });
+        } else if (type === 'wishlist') {
+          list.unshift({ id: uid(), artist, name });
+        }
+      }
+      setEditMode(type, null);
+      saveState();
+      renderAll();
+      // 重置表单
+      const form = document.getElementById(type === 'seen' ? 'form-seen' : type === 'upcoming' ? 'form-upcoming' : 'form-wish');
+      if (form) form.reset();
+    }
+
+
+    // 唯一ID生成
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+    // 日期格式化
+    const formatDateDisplay = (iso) => {
+      try {
+        const d = new Date(iso);
+        const yyyy = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${m}-${day}`;
+      } catch {
+        return iso;
+      }
+    };
+
+    // 计算天数差（用于倒计时）：统一按本地时区“当天 0 点”计算
+    const dayStartMs = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const daysUntil = (isoDate) => {
+      const msPerDay = 24*60*60*1000;
+      let target;
+      if (isoDate) {
+        const p = String(isoDate).split('-').map(Number);
+        target = new Date(p[0], p[1]-1, p[2]);
+      } else {
+        target = new Date();
+      }
+      const diff = dayStartMs(target) - dayStartMs(new Date());
+      return Math.round(diff / msPerDay);
+    };
+
+    // DOM helpers
+    const el = (sel) => document.querySelector(sel);
+    const els = (sel) => Array.from(document.querySelectorAll(sel));
+
+    // 载入本地数据
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let loaded = false;
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          Object.assign(state, parsed);
+          loaded = true;
+        } catch (e) {
+          console.error('加载存档失败', e);
+        }
+      }
+      // 首次打开（本地无存档）时，载入内置示例数据，便于分享与预览
+      if (!loaded) {
+        Object.assign(state, JSON.parse(JSON.stringify(DEFAULT_DATA)));
+      }
+      if (!state.seenSortMode) state.seenSortMode = 'date-desc';
+      if (!Array.isArray(state.seen)) state.seen = [];
+      if (!Array.isArray(state.upcoming)) state.upcoming = [];
+      if (!Array.isArray(state.wishlist)) state.wishlist = [];
+      // 照片功能已移除：清理旧存档里的照片字段，避免大体积 base64 残留
+      state.seen.forEach(it => {
+        if (it) { delete it.photos; delete it.editMode; }
+      });
+    }
+
+    // 保存当前状态（带容量溢出提示）
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.error(err);
+        alert('本地存储已满，无法保存。建议你删除一些现场照片后再试。');
+      }
+    }
+
+    // 清空所有数据
+    function clearAll() {
+      if (!confirm('清空所有数据吗？此操作不可撤销。')) return;
+      state.seen = [];
+      state.upcoming = [];
+      state.wishlist = [];
+      saveState();
+      renderAll();
+    }
+
+    // 排序辅助：已看过的演唱会排序
+    function sortSeenList(list) {
+      const mode = state.seenSortMode || 'date-desc';
+      const arr = list.slice();
+      if (mode === 'date-desc') {
+        return arr.sort((a,b) => dayStartMs(new Date(b.date)) - dayStartMs(new Date(a.date)));
+      } else if (mode === 'artist-asc') {
+        return arr.sort((a,b) => {
+          const an = (a.artist || '').toLowerCase();
+          const bn = (b.artist || '').toLowerCase();
+          if (an !== bn) return an < bn ? -1 : 1;
+          // 同歌手，按时间倒序
+          return dayStartMs(new Date(b.date)) - dayStartMs(new Date(a.date));
+        });
+      }
+      return arr;
+    }
+
+    // 渲染入口
+    function renderAll() {
+      renderSeen();
+      renderUpcoming();
+      renderWishlist();
+      renderStats();
+    }
+
+    // 生成票根编号（按记录 id 稳定生成，刷新不变）
+    function serialOf(id) {
+      let h = 0;
+      const s = String(id || '');
+      for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+      const n = (h % 90000) + 10000;
+      return { full: 'NO. ' + n, short: 'BB-' + n };
+    }
+
+    // 票根卡片 HTML（status: 'seen' | 'upcoming'）
+    function ticketCardHTML(item, status) {
+      const serial = serialOf(item.id);
+      const isSeen = status === 'seen';
+      const admitText = isSeen ? 'ADMIT ONE · 已观演' : 'ADMIT ONE · 待观演';
+      const stampText = isSeen ? '已看' : '将看';
+      const dateStr = formatDateDisplay(item.date);
+      const cityStr = escapeHtml(item.city || '—');
+      const venueStr = escapeHtml(item.venue || '—');
+      const footLeft = isSeen
+        ? `记录于 ${(item.date || '').slice(0, 4) || '—'}`
+        : `<span class="countdown" data-id="${item.id}"></span>`;
+      return `
+        <div class="ticket-card">
+          <div class="tc-main">
+            <div class="tc-top">
+              <span class="tc-admit">${admitText}</span>
+              <span class="tc-serial">${serial.full}</span>
+            </div>
+            <h2 class="tc-event">${escapeHtml(item.artist)}<span class="dot">·</span>${escapeHtml(item.name)}</h2>
+            <div class="tc-grid">
+              <div><span class="k">DATE</span><span class="v">${dateStr}</span></div>
+              <div><span class="k">CITY</span><span class="v">${cityStr}</span></div>
+              <div><span class="k">VENUE</span><span class="v">${venueStr}</span></div>
+            </div>
+            <div class="tc-foot">
+              <span>${footLeft}</span>
+              <span class="brand">CONCERT SCRAPBOOK</span>
+            </div>
+          </div>
+          <div class="tc-stub">
+            <span class="tc-stub-label">STUB</span>
+            <div class="tc-stub-event">${escapeHtml(item.name)}</div>
+            <div class="tc-stub-meta">${cityStr} · ${dateStr}</div>
+            <span class="tc-stamp">${stampText}</span>
+            <div class="tc-dash"></div>
+            <div class="tc-stub-num">${serial.short}</div>
+          </div>
+        </div>`;
+    }
+
+    // 渲染“已看过”的演唱会
+    function renderSeen() {
+      const container = document.getElementById('seen-list');
+      if (!container) return;
+      container.innerHTML = '';
+      let sorted = sortSeenList(state.seen);
+
+      // 搜索过滤
+      const q = seenSearchTerm.trim().toLowerCase();
+      if (q) {
+        sorted = sorted.filter(it =>
+          (it.artist || '').toLowerCase().includes(q) ||
+          (it.name || '').toLowerCase().includes(q) ||
+          (it.city || '').toLowerCase().includes(q) ||
+          (it.venue || '').toLowerCase().includes(q)
+        );
+      }
+
+      if (sorted.length === 0) {
+        container.innerHTML = q
+          ? '<div class="empty-tip">没有找到匹配的记录 🔍</div>'
+          : '<div class="empty-tip">还没有看过演唱会，添加第一条记录吧 🎵</div>';
+        return;
+      }
+
+      // 手绘风回形针（放大）
+      const paperclip = `<svg class="paperclip" viewBox="0 0 40 90" aria-hidden="true">
+        <path d="M13 12 V64 a11 11 0 0 0 22 0 V22 a8 8 0 0 0 -16 0 V60"
+              fill="none" stroke="#4a6b80" stroke-width="5" stroke-linecap="round"/>
+      </svg>`;
+
+      // 按年份分段（仅在“时间倒序”模式下）
+      const groupByYear = (state.seenSortMode || 'date-desc') === 'date-desc';
+      let html = '<div class="timeline">';
+      let lastYear = null;
+      sorted.forEach(item => {
+        const year = (item.date || '').slice(0, 4) || '未知年份';
+        if (groupByYear && year !== lastYear) {
+          html += `<div class="year-tab">${escapeHtml(year)}</div>`;
+          lastYear = year;
+        }
+        html += `
+          <div class="tl-item">
+            ${paperclip}
+            ${ticketCardHTML(item, 'seen')}
+            <div class="ticket-controls" style="justify-content:flex-end; margin-top:8px;">
+              <button class="btn" data-action="edit-record" data-type="seen" data-id="${item.id}">编辑</button>
+              <button class="btn danger" data-action="remove-seen" data-id="${item.id}">删除记录</button>
+            </div>
+          </div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+
+      // 更新排序选择框的当前值
+      const seenSort = document.getElementById('seen-sort');
+      if (seenSort) seenSort.value = state.seenSortMode;
+    }
+
+    // （照片功能已移除）
+
+    // 渲染“即将看”的演唱会（撕历倒计时 + 小票根列表）
+    function renderUpcoming() {
+      const container = document.getElementById('upcoming-list');
+      container.innerHTML = '';
+      if (state.upcoming.length === 0) {
+        container.innerHTML = '<div class="empty-tip">还没有安排即将去看的演唱会 ✨</div>';
+        return;
+      }
+      const sorted = state.upcoming.slice().sort((a, b) =>
+        dayStartMs(new Date(a.date)) - dayStartMs(new Date(b.date))
+      );
+      const nearest = sorted[0];
+
+      let html = '';
+      if (nearest) {
+        html += `
+          <div class="flipcal-card">
+            <div class="flipcal-title">最近一场 · ${escapeHtml(nearest.artist)} — ${escapeHtml(nearest.name)}</div>
+            <div class="flipcal">
+              <div class="cell"><div class="digits" id="flip-days">—</div><div class="unit">天</div></div>
+              <div class="cell"><div class="digits" id="flip-hours">—</div><div class="unit">时</div></div>
+            </div>
+            <div class="prog"><i id="flip-prog" style="width:0%"></i></div>
+            <div class="flipcal-meta">${formatDateDisplay(nearest.date)} · ${escapeHtml(nearest.city || '')} · ${escapeHtml(nearest.venue || '')}</div>
+          </div>`;
+      }
+
+      sorted.forEach(item => {
+        html += `
+          <div class="up-item" style="margin-bottom:22px;">
+            ${ticketCardHTML(item, 'upcoming')}
+            <div class="ticket-controls" style="justify-content:flex-end; margin-top:8px;">
+              <button class="btn" data-action="edit-record" data-type="upcoming" data-id="${item.id}">编辑</button>
+              <button class="btn" data-action="upcoming-to-seen" data-id="${item.id}">已完成·转已看</button>
+              <button class="btn secondary" data-action="remove-upcoming" data-id="${item.id}">删除</button>
+            </div>
+          </div>`;
+      });
+      container.innerHTML = html;
+      updateCountdowns();
+    }
+
+    // 生成某场演出的倒计时文案
+    function countdownText(isoDate, now) {
+      const diffDays = daysUntil(isoDate);
+      if (diffDays < 0) return '已过期';
+      const hoursLeft = Math.floor((new Date(isoDate).getTime() - now.getTime()) / 3600000);
+      if (diffDays === 0) return hoursLeft > 0 ? `就是今天！还剩 ${hoursLeft} 小时` : '就是今天！';
+      const d = Math.floor(hoursLeft / 24);
+      const h = hoursLeft % 24;
+      return `还剩 ${d} 天 ${h} 小时`;
+    }
+
+    // 更新倒计时（小票根 + 最近一场撕历）
+    function updateCountdowns() {
+      const now = new Date();
+      state.upcoming.forEach(it => {
+        const elCount = document.querySelector(`.countdown[data-id="${it.id}"]`);
+        if (elCount) elCount.textContent = countdownText(it.date, now);
+      });
+
+      // 最近一场的撕历数字与进度条
+      const sorted = state.upcoming.slice().sort((a, b) =>
+        dayStartMs(new Date(a.date)) - dayStartMs(new Date(b.date))
+      );
+      const nearest = sorted[0];
+      const daysEl = document.getElementById('flip-days');
+      const hoursEl = document.getElementById('flip-hours');
+      const progEl = document.getElementById('flip-prog');
+      if (nearest && daysEl && hoursEl) {
+        const diffDays = daysUntil(nearest.date);
+        const hoursLeft = Math.max(0, Math.floor((new Date(nearest.date).getTime() - now.getTime()) / 3600000));
+        daysEl.textContent = String(Math.max(0, diffDays));
+        hoursEl.textContent = String(hoursLeft % 24);
+        if (progEl) {
+          const pct = Math.max(0, Math.min(100, 100 - (diffDays / 365) * 100));
+          progEl.style.width = pct.toFixed(1) + '%';
+        }
+      }
+    }
+
+    // 渲染愿望清单（软木便利贴墙）
+    function renderWishlist() {
+      const container = document.getElementById('wish-list');
+      container.className = 'board';
+      if (state.wishlist.length === 0) {
+        container.innerHTML = '<div class="empty-tip" style="color:#3f5568;">愿望清单空空如也，写下你最想看的演唱会吧 🌟</div>';
+        return;
+      }
+      let html = '<div class="notes">';
+      state.wishlist.forEach((item, i) => {
+        const tone = i % 4;
+        html += `
+          <div class="note-card tone-${tone} ${item.done ? 'is-done' : ''}">
+            <svg class="push" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="7" r="5.5" fill="#e35d5d"/>
+              <circle cx="10.4" cy="5.6" r="1.6" fill="#ffb3b3"/>
+              <rect x="11" y="12" width="2" height="9" fill="#9aa4b1"/>
+            </svg>
+            <h4>${escapeHtml(item.artist)} — ${escapeHtml(item.name)}</h4>
+            <div class="muted">只记歌手 / 演出名</div>
+            <div class="n-acts">
+              <button class="btn" data-action="edit-record" data-type="wishlist" data-id="${item.id}">编辑</button>
+              <button class="btn" data-action="wishlist-move" data-id="${item.id}">转将看</button>
+              <label class="done-check"><input type="checkbox" data-id="${item.id}" data-action="wishlist-complete" ${item.done ? 'checked' : ''}/>完成</label>
+              <button class="btn danger" data-action="remove-wishlist" data-id="${item.id}">删除</button>
+            </div>
+            ${item.done ? '<div class="stamp">完成</div>' : ''}
+          </div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // 渲染统计面板，总结
+    function renderStats() {
+      document.getElementById('stat-seen').textContent = state.seen.length;
+      document.getElementById('stat-upcoming').textContent = state.upcoming.length;
+      document.getElementById('stat-wishlist').textContent = state.wishlist.length;
+
+      // 最近一场已看
+      const recent = [...state.seen].sort((a,b) => dayStartMs(new Date(b.date)) - dayStartMs(new Date(a.date)))[0];
+      const recentEl = document.getElementById('stat-recent-label');
+      if (recent) {
+        recentEl.textContent = `最近一场已看：${recent.artist} - ${recent.name} (${formatDateDisplay(recent.date)})`;
+      } else {
+        recentEl.textContent = '最近一场已看：暂无';
+      }
+
+      // 独特歌手数
+      const uniqueArtists = new Set(state.seen.map(s => (s.artist || '').toString().toLowerCase().trim())).size;
+      const uniqueEl = document.getElementById('stat-unique-label');
+      uniqueEl.textContent = String(uniqueArtists || 0);
+
+      // 观演城市数
+      const citiesUnique = new Set(
+        state.seen
+          .map(s => (s.city || '').toString().toLowerCase().trim())
+          .filter(c => c)
+      ).size;
+      const citiesEl = document.getElementById('stat-cities-label');
+      citiesEl && (citiesEl.textContent = String(citiesUnique));
+
+      // 最值得期待的一场
+      const upcomingSoon = [...state.upcoming].sort((a,b) => dayStartMs(new Date(a.date)) - dayStartMs(new Date(b.date)))[0];
+      const favEl = document.getElementById('stat-favorites-label');
+      if (upcomingSoon) {
+        favEl.textContent = `最期待：${upcomingSoon.artist} - ${upcomingSoon.name} (${formatDateDisplay(upcomingSoon.date)})`;
+      } else {
+        favEl.textContent = '最期待：暂无';
+      }
+    }
+
+    // 安全输出文本
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // 表单事件处理
+    function initEventHandlers(){
+      // 音效开关
+      updateSoundToggle();
+      const soundBtn = document.getElementById('sound-toggle');
+      if (soundBtn) {
+        soundBtn.addEventListener('click', () => {
+          soundEnabled = !soundEnabled;
+          localStorage.setItem('concertSound', soundEnabled ? 'on' : 'off');
+          updateSoundToggle();
+          if (soundEnabled) beep(880, 0.08, 'square', 0.04);
+        });
+      }
+      // 全局按钮点击音效（capture 阶段，任何按钮都触发）
+      document.addEventListener('click', (e) => {
+        if (e.target && e.target.closest && e.target.closest('button') && !e.target.closest('#sound-toggle')) {
+          beep(720, 0.045, 'square', 0.03);
+        }
+      }, true);
+
+      // 模块开关按钮事件
+      const moduleBtns = Array.from(document.querySelectorAll('.module-btn'));
+      moduleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const module = btn.getAttribute('data-module');
+          flipTo(module);
+          moduleBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // 已看新增/编辑
+      document.getElementById('form-seen').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const artist = document.getElementById('seen-artist').value.trim();
+        const name = document.getElementById('seen-name').value.trim();
+        const date = document.getElementById('seen-date').value;
+        const city = document.getElementById('seen-city').value.trim();
+        const venue = document.getElementById('seen-venue').value.trim();
+        if(!artist || !name || !date) return;
+
+        saveRecord('seen', { artist, name, date, city, venue });
+      });
+
+      // 排序下拉（修复：绑定 change 监听，只重绘已看列表）
+      const seenSortEl = document.getElementById('seen-sort');
+      seenSortEl.addEventListener('change', (e) => {
+        state.seenSortMode = e.target.value;
+        saveState();
+        renderSeen();
+      });
+
+      // 搜索输入（实时过滤已看列表）
+      const seenSearchEl = document.getElementById('seen-search');
+      seenSearchEl.addEventListener('input', (e) => {
+        seenSearchTerm = e.target.value;
+        renderSeen();
+      });
+
+      // 导出备份
+      document.getElementById('btn-export').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify({ meta: { app: '个人演唱会纪念网站', version: 1, exportedAt: new Date().toISOString() }, state }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `演唱会纪念备份_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+
+      // 导入恢复
+      document.getElementById('btn-import').addEventListener('click', () => {
+        document.getElementById('import-file').click();
+      });
+      document.getElementById('import-file').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            if (!parsed || !parsed.state || !Array.isArray(parsed.state.seen)) {
+              alert('导入失败：文件格式不正确。');
+              return;
+            }
+            const imported = parsed.state;
+            // 合并去重：以“歌手+名称+城市”为去重键，避免重复导入
+            const seenKey = (it) => `${(it.artist||'').trim()}|${(it.name||'').trim()}|${(it.city||'').trim()}|${(it.venue||'').trim()}|${(it.date||'')}`;
+            const existingSeen = new Set(state.seen.map(seenKey));
+            (imported.seen || []).forEach(it => {
+              if (!existingSeen.has(seenKey(it))) {
+                state.seen.push({ id: uid(), artist: it.artist || '', name: it.name || '', date: it.date || '', city: it.city || '', venue: it.venue || '' });
+                existingSeen.add(seenKey(it));
+              }
+            });
+            (imported.upcoming || []).forEach(it => {
+              state.upcoming.unshift({ id: uid(), artist: it.artist || '', name: it.name || '', date: it.date || '', city: it.city || '', venue: it.venue || '' });
+            });
+            (imported.wishlist || []).forEach(it => {
+              state.wishlist.unshift({ id: uid(), artist: it.artist || '', name: it.name || '' });
+            });
+            if (imported.seenSortMode) state.seenSortMode = imported.seenSortMode;
+            saveState();
+            renderAll();
+            alert('导入成功！已合并数据。');
+          } catch (err) {
+            console.error(err);
+            alert('导入失败：无法解析文件。');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      // 即将看新增/编辑
+      document.getElementById('form-upcoming').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const artist = document.getElementById('up-artist').value.trim();
+        const name = document.getElementById('up-name').value.trim();
+        const date = document.getElementById('up-date').value;
+        const city = document.getElementById('up-city').value.trim();
+        const venue = document.getElementById('up-venue').value.trim();
+        if(!artist || !name || !date) return;
+
+        saveRecord('upcoming', { artist, name, date, city, venue });
+      });
+
+      // 愿望新增/编辑
+      document.getElementById('form-wish').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const artist = document.getElementById('wish-artist').value.trim();
+        const name = document.getElementById('wish-name').value.trim();
+        if(!artist || !name) return;
+
+        saveRecord('wishlist', { artist, name });
+      });
+
+      // 事件委托：按钮行动
+      document.addEventListener('click', (e) => {
+        const t = e.target;
+        if (t.matches('[data-action="home"]')) {
+          flipTo(null);
+        }
+        // 进入编辑模式
+        if (t.matches('[data-action="edit-record"]')) {
+          const type = t.getAttribute('data-type');
+          const id = t.getAttribute('data-id');
+          startEdit(type, id);
+          return;
+        }
+        // 取消编辑
+        if (t.matches('[data-action="cancel-edit"]')) {
+          const type = t.getAttribute('data-type');
+          cancelEdit(type);
+          return;
+        }
+        // 删除愿望记录
+        if (t.matches('[data-action="remove-wishlist"]')) {
+          const id = t.getAttribute('data-id');
+          if (!confirm('确定删除这条愿望吗？')) return;
+          state.wishlist = state.wishlist.filter(x => x.id !== id);
+          saveState();
+          renderAll();
+        }
+        if (t.matches('[data-action="remove-seen"]')) {
+          const id = t.getAttribute('data-id');
+          if (!confirm('确定删除这条已看记录吗？该操作不可撤销。')) return;
+          state.seen = state.seen.filter(s => s.id !== id);
+          saveState();
+          renderAll();
+        }
+        if (t.matches('[data-action="remove-upcoming"]')) {
+          const id = t.getAttribute('data-id');
+          state.upcoming = state.upcoming.filter(u => u.id !== id);
+          saveState();
+          renderAll();
+        }
+        // 即将看 → 已看（完成后移入）
+        if (t.matches('[data-action="upcoming-to-seen"]')) {
+          const id = t.getAttribute('data-id');
+          const u = state.upcoming.find(x => x.id === id);
+          if (!u) return;
+          if (!confirm(`确认「${u.artist} - ${u.name}」已经看完了吗？将移入「已看过」。`)) return;
+          state.seen.unshift({ id: uid(), artist: u.artist, name: u.name, date: u.date, city: u.city, venue: u.venue });
+          state.upcoming = state.upcoming.filter(x => x.id !== id);
+          saveState();
+          renderAll();
+        }
+        if (t.matches('[data-action="wishlist-move"]')) {
+          const id = t.getAttribute('data-id');
+          const w = state.wishlist.find(w => w.id === id);
+          if (w) {
+            const date = prompt('请输入演唱会日期（YYYY-MM-DD）以转为即将观看：', new Date().toISOString().slice(0,10));
+            const city = prompt('城市（可留空）', '');
+            const venue = prompt('场馆（可留空）', '');
+            if (date) {
+              state.upcoming.unshift({ id: uid(), artist: w.artist, name: w.name, date, city: city || '', venue: venue || '' });
+              state.wishlist = state.wishlist.filter(x => x.id !== id);
+              saveState();
+              renderAll();
+            }
+          }
+        }
+        // 完成愿望（盖印章，不删除）
+        if (t.matches('[data-action="wishlist-complete"]')) {
+          const id = t.getAttribute('data-id');
+          const w = state.wishlist.find(x => x.id === id);
+          if (w) {
+            w.done = !w.done;
+            saveState();
+            renderWishlist();
+            renderStats();
+          }
+        }
+      });
+    }
+
+    // 初始化区域
+    function init(){
+      loadState();
+      initEventHandlers();
+      renderAll();
+      // 倒计时刷新（含“零头小时”），每分钟更新一次
+      setInterval(updateCountdowns, 60 * 1000);
+      showModule(null);
+    }
+
+    // 翻页动画：点击目录翻到对应页面；传 null 表示翻回首页
+    let isFlipping = false;
+    const MODULE_TITLES = {
+      seen: '已看过的演唱会',
+      upcoming: '即将去看的演唱会',
+      wishlist: '想看的演唱会',
+      home: '个人演唱会纪念手帐'
+    };
+    function flipTo(moduleName) {
+      const sheet = document.getElementById('flip-sheet');
+      const titleEl = document.getElementById('flip-title');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const narrow = window.matchMedia('(max-width: 859px)').matches;
+      // 无纸页 / 减少动效 / 窄屏：直接切换，不播放翻页
+      if (!sheet || reduce || narrow) {
+        showModule(moduleName || null);
+        return;
+      }
+      if (isFlipping) return;
+      isFlipping = true;
+
+      if (titleEl) titleEl.textContent = MODULE_TITLES[moduleName || 'home'] || '';
+
+      if (moduleName) {
+        // 翻开：右页纸向左翻，翻完切换内容
+        sheet.classList.remove('turning-back');
+        void sheet.offsetWidth;
+        sheet.classList.add('turning');
+        setTimeout(() => { showModule(moduleName); }, 720);
+        setTimeout(() => { sheet.classList.remove('turning'); isFlipping = false; }, 760);
+      } else {
+        // 合上：先显示首页，再把纸翻回右侧
+        showModule(null);
+        sheet.classList.remove('turning');
+        void sheet.offsetWidth;
+        sheet.classList.add('turning-back');
+        setTimeout(() => { sheet.classList.remove('turning-back'); isFlipping = false; }, 760);
+      }
+    }
+
+    // 显示模块，null 为首页
+    function showModule(moduleName){
+      const modules = ['seen','upcoming','wishlist'];
+      const switcher = document.getElementById('module-switcher');
+      const homeSpread = document.getElementById('home-spread');
+      const mapSectionId = (name) => (name === 'wishlist') ? 'wish-section' : name + '-section';
+
+      if (!moduleName) {
+        document.querySelectorAll('.module-section').forEach(sec => sec.style.display = 'none');
+        if (homeSpread) homeSpread.style.display = 'grid';
+        if (switcher) switcher.style.display = 'block';
+        document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+        const statsSection = document.getElementById('stats-section');
+        if (statsSection) statsSection.style.display = 'block';
+        return;
+      }
+
+      modules.forEach(m => {
+        const sec = document.getElementById(mapSectionId(m));
+        if (sec) sec.style.display = (m === moduleName) ? 'block' : 'none';
+      });
+
+      if (homeSpread) homeSpread.style.display = 'none';
+      if (switcher) switcher.style.display = 'none';
+      document.querySelectorAll('.module-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-module') === moduleName);
+      });
+
+      // 首页的总结区块在进入其他板块时隐藏
+      const statsSection = document.getElementById('stats-section');
+      if (statsSection) statsSection.style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 启动
+    init();
+  </script>
+</body>
+</html>
